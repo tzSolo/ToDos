@@ -1,41 +1,56 @@
-import { Alert, Button, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import React, { useContext, useState } from 'react'
-import { initItem, Item } from '../models/item.model';
+import { Item } from '../models/item.model';
 import { TodosProvider } from './TodosContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
-const Todo = () => {
+const Todo = ({ caption, todo }: { caption: string, todo: Item }) => {
     const { items, setItems } = useContext(TodosProvider);
-    const [newItem, setNewItem] = useState<Item>(initItem);
+    const [newItem, setNewItem] = useState<Item>(todo);
 
     const addTodoAsync = async () => {
         try {
             await AsyncStorage.setItem("todos", JSON.stringify([...items, newItem]));
             setItems([...items, newItem]);
-            console.log(newItem.name);
-
+            showToast("Success");
         }
         catch (e: any) {
-            console.error("error : ", e);
+            showToast("Failed");
+        }
+    };
+
+    const editTodoAsync = async() => {
+        try {
+            await AsyncStorage.setItem("todos", JSON.stringify([items]));
+            showToast("Success");
+        }
+        catch (e: any) {
+            showToast("Failed");
         }
     }
-    const showToast = () => {
-        Toast.show({
-            text1: 'Success !',
-            text2: 'ToDo added successfully.',
-            position: 'top',
-            type: 'success',
-        });
+
+    const showToast = (status: string) => {
+        if (status == "Success") {
+            Toast.show({
+                text1: 'Success !',
+                text2: `ToDo ${caption}ed successfully.`,
+                position: 'bottom',
+                type: 'success',
+            });
+        } else {
+            Toast.show({
+                text1: 'Error !',
+                text2: `Failed to ${caption} todo.`,
+                position: 'bottom',
+                type: 'error',
+            });
+        }
     };
 
     return (
-        <SafeAreaView>
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Button title="Show Toast" onPress={showToast} />
-                <Toast />
-            </View>
+        <SafeAreaView style={styles.Container}>
             <View style={styles.View}>
                 <TextInput
                     style={styles.TextInput}
@@ -43,12 +58,12 @@ const Todo = () => {
                     value={newItem.name}
                     onChangeText={(value) => setNewItem({ ...newItem, name: value })}
                 />
-                <Pressable onPress={() => addTodoAsync()} style={({ pressed }) => [{
+                <Pressable onPress={() => caption == "Add" ? addTodoAsync() : editTodoAsync()} style={({ pressed }) => [{
                     backgroundColor: pressed ? "grey" : "indigo"
                 },
                 styles.Pressable]}
                 >
-                    <Text>Add ToDo</Text>
+                    <Text>{caption} ToDo</Text>
                 </Pressable >
             </View>
         </SafeAreaView>
@@ -58,6 +73,9 @@ const Todo = () => {
 export default Todo
 
 const styles = StyleSheet.create({
+    Container: {
+        flex: 1
+    },
     TextInput: {
         borderColor: "black",
         borderWidth: 3,

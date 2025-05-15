@@ -1,19 +1,22 @@
-import React, { useContext, useState } from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import React, { useContext } from 'react';
+import { View, Text, StyleSheet, Button } from 'react-native';
 import { TodosProvider } from './TodosContext';
+import EditToDo from './EditToDo';
 
 const ShowAllToDos = () => {
-
     const { items } = useContext(TodosProvider);
 
     return (
         <View>
-            {items.map((item, index) => (
-                <View key={index} style={styles.itemContainer}>
-                    <Text style={styles.itemName}>{item.name}</Text>
-                    <Text style={styles.itemStatus}>{item.isComplete}</Text>
-                </View>
-            ))}
+            <View>
+                {items.map((item, index) => (
+                    <View key={index} style={styles.itemContainer}>
+                        <Text style={styles.itemName}>{item.name}</Text>
+                        <Text style={styles.itemStatus}>{item.isComplete}</Text>
+                        {/* <EditToDo item={item} /> */}
+                    </View>
+                ))}
+            </View>
         </View>
     );
 };

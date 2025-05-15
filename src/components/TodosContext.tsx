@@ -15,7 +15,7 @@ const initTodoContext: TodoContext = {
 
 export const TodosProvider = createContext<TodoContext>(initTodoContext);
 
-const TodosContext = ({ children }: { children: ReactElement }) => {
+const TodosContext = ({ children }: { children: ReactElement[] }) => {
   const [items, setItems] = useState<Item[]>([initItem]);
 
   const getAllTodosAsync = async () => {
